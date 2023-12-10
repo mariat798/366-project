@@ -366,7 +366,7 @@ class Backtracking:
 
     def search(self, grid, var_selector, ac3, Q, bad_assignments = []):
         """
-        Implements backtracking search with inference. 
+        Implements backtracking search with inference.
         """
 
         if grid.is_solved():
@@ -376,6 +376,8 @@ class Backtracking:
         if v is None:
             return None
 
+        # check to see if the current assignments will lead to an unsolvable grid,
+        # and return if they will
         for bad_assignment in bad_assignments:
             all_exist = True
             
@@ -405,8 +407,32 @@ class Backtracking:
                 rb = self.search(copy, var_selector, ac3, _Q, bad_assignments)
                 if rb is not None:
                     return rb
-        
+
+        # indexes of the bad_assignments array to remove
+        assignments_to_remove = []
+        # remove the last element since it was not assigned a value
         _Q.pop()
+
+        # check for bad_assingments that are already contained in the to-be-appended _Q array
+        for i in range(len(bad_assignments)):
+            bad_assignment = bad_assignments[i]
+            all_exist = True
+            
+            for coord_value in _Q:
+                if not coord_value in bad_assignment:
+                    all_exist = False
+                    break
+            
+            # the current bad_assignment is included in the to-be-appended _Q array
+            if all_exist:
+                assignments_to_remove.append(i)
+
+        # remove redundant bad_assignments
+        j = 0
+        for i in assignments_to_remove:
+            del bad_assignments[i-j]
+            j += 1
+
         bad_assignments.append(_Q)
         return None
 
@@ -422,8 +448,12 @@ ac3 = AC3()
 
 mrv_times = []
 fa_times = []
+i = 0
 
 for p in problems:
+    i += 1
+    print(f"{i} / {len(problems)}")
+
     # Read problem from string
     g = Grid()
     g.read_file(p)
@@ -431,11 +461,11 @@ for p in problems:
     Q = ac3.pre_process_consistency(g)
 
     start_mrv = time.time()
-    print(b.search(g, mrv, ac3, Q).is_solved())
+    b.search(g, mrv, ac3, Q)
     end_mrv = time.time()
 
     start_fa = time.time()
-    print(b.search(g, fa, ac3, Q).is_solved())
+    b.search(g, fa, ac3, Q)
     end_fa = time.time()
 
     mrv_times.append(end_mrv - start_mrv)
