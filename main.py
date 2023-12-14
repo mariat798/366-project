@@ -25,6 +25,11 @@ class PlotResults:
         np.min([ax.get_xlim(), ax.get_ylim()]),  # min of both axes
         np.max([ax.get_xlim(), ax.get_ylim()]),  # max of both axes
         ]
+
+        # lims = [
+        #     -15,
+        #     265
+        # ]
     
         ax.plot(lims, lims, 'k-', alpha=0.75, zorder=0)
         ax.set_aspect('equal')
